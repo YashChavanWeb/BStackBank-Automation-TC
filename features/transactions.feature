@@ -5,10 +5,7 @@ Feature: Transaction History
   So that I can track my financial activity
 
   Background:
-    Given the BStackBank app is launched
-    When I tap the autofill regular user button
-    And I tap the login button
-    Then I should see the home dashboard
+    Given I am on the home dashboard
 
   @transactions-list
   Scenario: View transaction history screen

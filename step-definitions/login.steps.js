@@ -75,6 +75,40 @@ Given('the BStackBank app is launched', async () => {
   );
 });
 
+/**
+ * Smart background step for transfer/transactions features.
+ * - First scenario in the session: app is on login screen → login with autofill.
+ * - Subsequent scenarios: already authenticated → just navigate to Home tab.
+ * Requires noReset:true in capabilities so session state persists across scenarios.
+ */
+Given('I am on the home dashboard', async () => {
+  const pageSrc = await driver.getPageSource();
+  const isAuthenticated =
+    pageSrc.includes('Total Balance') ||
+    pageSrc.includes('Good morning') ||
+    pageSrc.includes(', Transfer') ||
+    pageSrc.includes(', Transactions') ||
+    pageSrc.includes(', Cards') ||
+    pageSrc.includes(', Profile');
+
+  if (isAuthenticated) {
+    // Already logged in — navigate to Home tab
+    const homeTab = await $('android=new UiSelector().descriptionContains(", Home")');
+    await homeTab.waitForDisplayed({ timeout: 5000 });
+    await homeTab.click();
+    await homePage.waitForDashboard();
+    return;
+  }
+
+  // Not yet logged in — perform full login flow once
+  await acceptNotificationPermission();
+  await loginPage.tap('android=new UiSelector().resourceId("autofill-regular")');
+  await loginPage.tapLoginButton();
+  await handleBiometricDialog();
+  await acceptLocationPermission();
+  await homePage.waitForDashboard();
+});
+
 Given('I am logged in as {string} with password {string}', async (username, password) => {
   await acceptNotificationPermission();
   await loginPage.login(username, password);

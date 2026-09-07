@@ -24,7 +24,7 @@ const capabilities = {
     'appium:platformVersion': '13.0',
     'appium:app': process.env.BS_APP_ID,
     'appium:automationName': 'UiAutomator2',
-    'appium:noReset': false,
+    'appium:noReset': true,
     'appium:newCommandTimeout': 300,
     'bstack:options': {
       ...bstackOptions('Android', 'BStackBank Android Test'),

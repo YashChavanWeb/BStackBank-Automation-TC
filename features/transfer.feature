@@ -5,10 +5,7 @@ Feature: Money Transfer
   So that I can send funds securely
 
   Background:
-    Given the BStackBank app is launched
-    When I tap the autofill regular user button
-    And I tap the login button
-    Then I should see the home dashboard
+    Given I am on the home dashboard
 
   @transfer-success
   Scenario: Successful money transfer to a recipient

@@ -21,6 +21,14 @@ When('I navigate to the Transfer screen', async () => {
     async () => transferPage.isTransferScreenDisplayed(),
     { timeout: 10000, timeoutMsg: 'Transfer screen did not appear' }
   );
+  // Scroll recipient list to top so first recipient is always visible.
+  // Use UiScrollable to scroll to the "Send To" label which is above the list.
+  try {
+    const sendToLabel = await $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("Send To"))');
+    await sendToLabel.waitForDisplayed({ timeout: 5000 });
+  } catch {
+    // Already at top or label not found — continue
+  }
 });
 
 When('I select recipient {string}', async (name) => {
