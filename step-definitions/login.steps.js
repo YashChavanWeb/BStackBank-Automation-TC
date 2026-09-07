@@ -64,6 +64,16 @@ Given('the BStackBank app is launched', async () => {
         await logoutFromApp();
         return false;
       }
+      if (pageSrc.includes('Create Account') || pageSrc.includes('Join BrowserStack')) {
+        // On signup screen — terminate and relaunch app to get back to login screen
+        try {
+          await driver.terminateApp('com.yash.bankingapp');
+          await driver.activateApp('com.yash.bankingapp');
+        } catch {
+          await driver.back();
+        }
+        return false;
+      }
       if (pageSrc.includes('Verify Your Identity')) {
         // On biometric screen (not logged in after cancel) — go back to login
         await driver.back();

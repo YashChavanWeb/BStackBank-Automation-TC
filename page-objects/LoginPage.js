@@ -76,8 +76,8 @@ class LoginPage extends BasePage {
   }
 
   async isLoginScreenDisplayed() {
-    // Check autofill-regular to confirm login screen is fully rendered
-    return this.isDisplayed('android=new UiSelector().resourceId("autofill-regular")');
+    // Check login-btn (always visible on login screen, not present on signup or home)
+    return this.isDisplayed('android=new UiSelector().resourceId("login-btn")');
   }
 
   async isErrorDisplayed() {
