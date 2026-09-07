@@ -9,7 +9,8 @@
     "test:smoke": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@smoke'",
     "test:regression": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@regression'",
     "test:login": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@login'",
-    "test:transfer": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@transfer'"
+    "test:transfer": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@transfer'",
+    "test:transactions": "wdio run wdio.conf.js --cucumberOpts.tagExpression='@transactions'"
   },
   "dependencies": {},
   "devDependencies": {

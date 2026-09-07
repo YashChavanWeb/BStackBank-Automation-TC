@@ -89,6 +89,7 @@ npm run test:ios
 | `npm run test:regression` | All `@regression` scenarios |
 | `npm run test:login` | All `@login` scenarios |
 | `npm run test:transfer` | All `@transfer` scenarios |
+| `npm run test:transactions` | All `@transactions` scenarios |
 
 ### Run a specific feature file
 ```bash
@@ -114,20 +115,20 @@ BStackBank-Automation-TC/
 ├── features/                    # Gherkin feature files
 │   ├── login.feature            # Login scenarios
 │   ├── transfer.feature         # Fund transfer scenarios
-│   └── account.feature          # Account management scenarios
+│   └── transactions.feature     # Transaction history scenarios
 │
 ├── step-definitions/            # Cucumber step implementations
 │   ├── hooks.js                 # Before/After hooks (screenshots on failure)
 │   ├── login.steps.js           # Login step definitions
 │   ├── transfer.steps.js        # Transfer step definitions
-│   └── account.steps.js         # Account step definitions
+│   └── transactions.steps.js    # Transaction history step definitions
 │
 ├── page-objects/                # Page Object Models
 │   ├── BasePage.js              # Shared utilities (tap, type, wait, scroll)
 │   ├── LoginPage.js             # Login screen selectors + actions
 │   ├── HomePage.js              # Home/Dashboard selectors + actions
 │   ├── TransferPage.js          # Transfer screen selectors + actions
-│   └── AccountPage.js           # Account screen selectors + actions
+│   └── TransactionsPage.js      # Transaction history selectors + actions
 │
 ├── config/
 │   └── capabilities.js          # BrowserStack capability definitions
@@ -151,9 +152,18 @@ BStackBank-Automation-TC/
 | `@regression` | Full regression suite |
 | `@login` | Login feature scenarios |
 | `@transfer` | Fund transfer scenarios |
-| `@account` | Account management scenarios |
+| `@transactions` | Transaction history scenarios |
 | `@valid-login` | Happy path login |
 | `@invalid-login` | Negative login test |
+| `@transfer-success` | Successful money transfer |
+| `@transfer-quick-amount` | Transfer via quick-amount chip |
+| `@transfer-with-remarks` | Transfer with optional remarks |
+| `@transfer-cancel-auth` | Cancel during transaction authorization |
+| `@transactions-list` | View transaction history screen |
+| `@transactions-filter-debit` | Filter transactions by Debit |
+| `@transactions-filter-credit` | Filter transactions by Credit |
+| `@transactions-filter-transfer` | Filter transactions by Transfer |
+| `@transactions-after-transfer` | Verify new transfer in history |
 | `@wip` | Work in progress — excluded from CI |
 
 ---
