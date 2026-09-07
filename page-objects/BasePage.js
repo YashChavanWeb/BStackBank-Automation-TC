@@ -70,17 +70,37 @@ class BasePage {
   }
 
   /**
-   * Scroll down on the screen
+   * Scroll down on the screen (cross-platform: Android UiScrollable / iOS mobile:scroll)
    */
   async scrollDown() {
-    await driver.execute('mobile: scroll', { direction: 'down' });
+    const platform = driver.capabilities?.platformName?.toLowerCase();
+    if (platform === 'ios') {
+      await driver.execute('mobile: scroll', { direction: 'down' });
+    } else {
+      await driver.action('pointer')
+        .move({ duration: 0, x: 540, y: 1600 })
+        .down({ button: 0 })
+        .move({ duration: 600, x: 540, y: 400 })
+        .up({ button: 0 })
+        .perform();
+    }
   }
 
   /**
-   * Scroll up on the screen
+   * Scroll up on the screen (cross-platform: Android UiScrollable / iOS mobile:scroll)
    */
   async scrollUp() {
-    await driver.execute('mobile: scroll', { direction: 'up' });
+    const platform = driver.capabilities?.platformName?.toLowerCase();
+    if (platform === 'ios') {
+      await driver.execute('mobile: scroll', { direction: 'up' });
+    } else {
+      await driver.action('pointer')
+        .move({ duration: 0, x: 540, y: 400 })
+        .down({ button: 0 })
+        .move({ duration: 600, x: 540, y: 1600 })
+        .up({ button: 0 })
+        .perform();
+    }
   }
 
   /**

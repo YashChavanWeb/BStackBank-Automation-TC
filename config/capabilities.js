@@ -26,7 +26,10 @@ const capabilities = {
     'appium:automationName': 'UiAutomator2',
     'appium:noReset': false,
     'appium:newCommandTimeout': 300,
-    'bstack:options': bstackOptions('Android', 'BStackBank Android Test'),
+    'bstack:options': {
+      ...bstackOptions('Android', 'BStackBank Android Test'),
+      enableBiometric: true,
+    },
   },
 
   androidTablet: {

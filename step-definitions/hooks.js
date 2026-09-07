@@ -28,7 +28,10 @@ After(async (scenario) => {
   if (status === 'FAILED') {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const scenarioName = scenario.pickle.name.replace(/\s+/g, '_').toLowerCase();
+      const scenarioName = scenario.pickle.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      // Ensure reports directory exists before saving screenshot
+      const fs = require('fs');
+      fs.mkdirSync('./reports/screenshots', { recursive: true });
       await driver.saveScreenshot(`./reports/screenshots/failure_${scenarioName}_${timestamp}.png`);
     } catch {
       // Screenshot may fail if session is already closed

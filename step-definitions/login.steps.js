@@ -50,8 +50,17 @@ Given('the BStackBank app is launched', async () => {
           }
         } catch { /* not present */ }
       }
-      if (pageSrc.includes('Total Balance') || pageSrc.includes('Good morning')) {
-        // Logged in on home screen — logout via Profile → Sign Out
+      // Detect any authenticated screen by presence of bottom nav tabs
+      // Covers Home, Transfer, Transactions, Cards, Profile screens
+      if (
+        pageSrc.includes('Total Balance') ||
+        pageSrc.includes('Good morning') ||
+        pageSrc.includes(', Transfer') ||
+        pageSrc.includes(', Transactions') ||
+        pageSrc.includes(', Cards') ||
+        pageSrc.includes(', Profile')
+      ) {
+        // Logged in on any app screen — logout via Profile → Sign Out
         await logoutFromApp();
         return false;
       }
