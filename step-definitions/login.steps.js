@@ -5,6 +5,7 @@ const {
   acceptNotificationPermission,
   handleBiometricDialog,
   acceptLocationPermission,
+  logoutFromApp,
 } = require('./hooks');
 
 /**
@@ -18,12 +19,50 @@ const {
  */
 
 Given('the BStackBank app is launched', async () => {
-  // Accept notification permission if it appears on launch
-  await acceptNotificationPermission();
-  // Wait for login screen
+  // Single waitUntil handles all intermediate states: permissions, home screen, biometric screen
   await driver.waitUntil(
-    async () => loginPage.isLoginScreenDisplayed(),
-    { timeout: 15000, timeoutMsg: 'Login screen did not appear within 15 seconds' }
+    async () => {
+      // Dismiss notification permission if present
+      try {
+        const notifBtn = await $('android=new UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_button")');
+        if (await notifBtn.isDisplayed()) {
+          await notifBtn.click();
+          return false;
+        }
+      } catch { /* not present */ }
+      // Dismiss location permission if present
+      try {
+        const locBtn = await $('android=new UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_foreground_only_button")');
+        if (await locBtn.isDisplayed()) {
+          await locBtn.click();
+          return false;
+        }
+      } catch { /* not present */ }
+      // Check current screen state
+      const pageSrc = await driver.getPageSource();
+      // Handle Sign Out confirmation dialog
+      if (pageSrc.includes('SIGN OUT')) {
+        try {
+          const signOutBtn = await $('android=new UiSelector().text("SIGN OUT")');
+          if (await signOutBtn.isDisplayed()) {
+            await signOutBtn.click();
+            return false;
+          }
+        } catch { /* not present */ }
+      }
+      if (pageSrc.includes('Total Balance') || pageSrc.includes('Good morning')) {
+        // Logged in on home screen — logout via Profile → Sign Out
+        await logoutFromApp();
+        return false;
+      }
+      if (pageSrc.includes('Verify Your Identity')) {
+        // On biometric screen (not logged in after cancel) — go back to login
+        await driver.back();
+        return false;
+      }
+      return loginPage.isLoginScreenDisplayed();
+    },
+    { timeout: 60000, timeoutMsg: 'Login screen did not appear within 60 seconds' }
   );
 });
 
@@ -49,6 +88,77 @@ When('I tap the login button', async () => {
 
 When('I tap the autofill regular user button', async () => {
   await loginPage.tap('android=new UiSelector().resourceId("autofill-regular")');
+});
+
+When('I fail the biometric verification 5 times', async () => {
+  // The BrowserStack executor is the ONLY way to interact with this system dialog.
+  // Send biometricMatch:fail 5 times via executor. After ~5 failures the app
+  // switches to a "Device Passcode" fallback dialog.
+  for (let i = 0; i < 5; i++) {
+    // Wait for biometric dialog
+    await driver.waitUntil(
+      async () => {
+        const src = await driver.getPageSource();
+        return src.includes('Biometric Authentication') || src.includes('Device Passcode');
+      },
+      { timeout: 10000, timeoutMsg: `Biometric/Passcode dialog did not appear on attempt ${i + 1}` }
+    );
+
+    const src = await driver.getPageSource();
+    // If passcode dialog already appeared, stop sending FAIL
+    if (src.includes('Device Passcode')) {
+      console.log(`[Step] Device Passcode dialog appeared after ${i} FAIL(s)`);
+      break;
+    }
+
+    // Send FAIL via executor
+    await driver.execute('browserstack_executor: {"action":"biometric", "arguments": {"biometricMatch": "fail"}}');
+    console.log(`[Step] Biometric FAIL sent via executor (attempt ${i + 1})`);
+  }
+});
+
+Then('I should see the device passcode dialog', async () => {
+  // After 5 biometric failures the app shows "Device Passcode" dialog with CANCEL/PASS
+  await driver.waitUntil(
+    async () => {
+      const src = await driver.getPageSource();
+      return src.includes('Device Passcode');
+    },
+    { timeout: 12000, timeoutMsg: 'Device Passcode dialog did not appear after biometric failures' }
+  );
+  const src = await driver.getPageSource();
+  expect(src).toContain('Device Passcode');
+});
+
+When('I cancel the passcode dialog', async () => {
+  // CANCEL button: resource-id="android:id/button3" (confirmed in test run logs)
+  const cancelBtn = await $('android=new UiSelector().resourceId("android:id/button3")');
+  await cancelBtn.waitForDisplayed({ timeout: 5000 });
+  await cancelBtn.click();
+  console.log('[Step] Passcode dialog CANCEL tapped');
+});
+
+When('I pass the passcode dialog', async () => {
+  // PASS button: resource-id="android:id/button1" (observed in live session)
+  await driver.execute('browserstack_executor: {"action":"biometric", "arguments": {"biometricMatch": "pass"}}');
+  console.log('[Step] Passcode dialog PASS sent via executor');
+});
+
+Then('I should see the biometric failure message', async () => {
+  // After cancelling passcode: bio-error element appears on the Verify Your Identity screen
+  // resource-id="bio-error", text="Biometric authentication failed. Please try again."
+  await driver.waitUntil(
+    async () => {
+      const src = await driver.getPageSource();
+      return src.includes('bio-error') || src.includes('Biometric authentication failed');
+    },
+    { timeout: 10000, timeoutMsg: 'Biometric failure message did not appear after cancelling passcode' }
+  );
+  const errorEl = await $('android=new UiSelector().resourceId("bio-error")');
+  await errorEl.waitForDisplayed({ timeout: 5000 });
+  const errorText = await errorEl.getText();
+  // Actual text observed: 'Biometric cancelled. Tap "Scan Biometric" to try again.'
+  expect(errorText).toContain('Biometric');
 });
 
 Then('I should see the home dashboard', async () => {

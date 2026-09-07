@@ -7,6 +7,24 @@ Feature: User Login
   Background:
     Given the BStackBank app is launched
 
+  @biometric-fail-cancel-passcode
+  Scenario: Login fails when biometric rejected and passcode cancelled
+    When I tap the autofill regular user button
+    And I tap the login button
+    And I fail the biometric verification 5 times
+    Then I should see the device passcode dialog
+    When I cancel the passcode dialog
+    Then I should see the biometric failure message
+
+  @biometric-fail-pass-passcode
+  Scenario: Login succeeds via passcode after biometric rejected
+    When I tap the autofill regular user button
+    And I tap the login button
+    And I fail the biometric verification 5 times
+    Then I should see the device passcode dialog
+    When I pass the passcode dialog
+    Then I should see the home dashboard
+
   @valid-login
   Scenario: Successful login using autofill Regular User
     When I tap the autofill regular user button

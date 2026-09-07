@@ -76,7 +76,8 @@ class LoginPage extends BasePage {
   }
 
   async isLoginScreenDisplayed() {
-    return this.isDisplayed('android=new UiSelector().text("Welcome Back")');
+    // Check autofill-regular to confirm login screen is fully rendered
+    return this.isDisplayed('android=new UiSelector().resourceId("autofill-regular")');
   }
 
   async isErrorDisplayed() {

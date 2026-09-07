@@ -89,8 +89,28 @@ async function acceptLocationPermission() {
   }
 }
 
+/**
+ * Logout from the app via Profile tab → Sign Out button.
+ * resource-id: logout-btn (content-desc: "Sign out of your account")
+ */
+async function logoutFromApp() {
+  try {
+    const profileTab = await $('android=new UiSelector().descriptionContains(", Profile")');
+    await profileTab.waitForDisplayed({ timeout: 5000 });
+    await profileTab.click();
+    // Use UiScrollable to scroll to logout button in native Android
+    const logoutBtn = await $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId("logout-btn"))');
+    await logoutBtn.waitForDisplayed({ timeout: 8000 });
+    await logoutBtn.click();
+    console.log('[Hook] Logged out via Profile → Sign Out');
+  } catch (e) {
+    console.log('[Hook] Logout failed:', e.message);
+  }
+}
+
 module.exports = {
   acceptNotificationPermission,
   handleBiometricDialog,
   acceptLocationPermission,
+  logoutFromApp,
 };
