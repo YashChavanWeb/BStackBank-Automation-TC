@@ -216,6 +216,19 @@ Then('I should see the home dashboard', async () => {
   expect(isDisplayed).toBe(true);
 });
 
+When('I tap the show password button', async () => {
+  const btn = await $('~Show Pasword');
+  await btn.waitForDisplayed({ timeout: 5000 });
+  await btn.click();
+});
+
+Then('the password field should be visible', async () => {
+  const passwordField = await $('android=new UiSelector().resourceId("password-input")');
+  await passwordField.waitForDisplayed({ timeout: 5000 });
+  const isPassword = await passwordField.getAttribute('password');
+  expect(isPassword).toBe('false');
+});
+
 Then('I should see an error message', async () => {
   await driver.waitUntil(
     async () => loginPage.isErrorDisplayed(),

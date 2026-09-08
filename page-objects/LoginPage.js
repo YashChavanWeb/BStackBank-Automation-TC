@@ -33,6 +33,10 @@ class LoginPage extends BasePage {
     return $('android=new UiSelector().resourceId("toggle-password-visibility")');
   }
 
+  get showPasswordButtonByDesc() {
+    return $('~Show Pasword');
+  }
+
   get signUpLink() {
     return $('android=new UiSelector().resourceId("goto-signup")');
   }

@@ -31,6 +31,12 @@ Feature: User Login
     And I tap the login button
     Then I should see the home dashboard
 
+  @password-visibility
+  Scenario: Password visibility toggle works on login screen
+    When I enter password "TestPassword123"
+    And I tap the show password button
+    Then the password field should be visible
+
   @invalid-login
   Scenario: Login fails with invalid credentials
     When I enter username "invalid@example.com"
