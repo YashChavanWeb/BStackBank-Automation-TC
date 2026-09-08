@@ -76,7 +76,7 @@ class LoginPage extends BasePage {
   }
 
   async isLoginScreenDisplayed() {
-    // Check login-btn (always visible on login screen, not present on signup or home)
+    // Check login-btn — always visible on login screen regardless of scroll position
     return this.isDisplayed('android=new UiSelector().resourceId("login-btn")');
   }
 

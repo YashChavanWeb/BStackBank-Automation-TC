@@ -90,7 +90,6 @@ npm run test:ios
 | `npm run test:login` | All `@login` scenarios |
 | `npm run test:transfer` | All `@transfer` scenarios |
 | `npm run test:transactions` | All `@transactions` scenarios |
-| `npm run test:signup` | All `@signup` scenarios |
 
 ### Run a specific feature file
 ```bash
